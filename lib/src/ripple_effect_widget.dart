@@ -35,6 +35,8 @@ class _RippleEffectState extends State<RippleEffect> with TickerProviderStateMix
   late Animation<double> thirdRippleWidthAnimation;
   late Animation<double> centerCircleRadiusAnimation;
 
+  Size? _size;
+
   @override
   void initState() {
     super.initState();
@@ -212,6 +214,11 @@ class _RippleEffectState extends State<RippleEffect> with TickerProviderStateMix
 
     centerCircleController.forward();
 
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      final RenderBox parentRenderBox = widget.parentKey.currentContext?.findRenderObject() as RenderBox;
+      _size = parentRenderBox.size;
+      setState(() {});
+    });
 
   }
 
@@ -226,10 +233,9 @@ class _RippleEffectState extends State<RippleEffect> with TickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
-    final RenderBox parentRenderBox = widget.parentKey.currentContext?.findRenderObject() as RenderBox;
-    final Size size = parentRenderBox.size;
-    return BackdropFilter(filter: ui.ImageFilter.blur(sigmaX: 2, sigmaY: 2, tileMode: TileMode.clamp),
-      child: SizedBox(height: size.height*0.5, width: size.width,
+
+    return _size == null ? SizedBox.shrink() : BackdropFilter(filter: ui.ImageFilter.blur(sigmaX: 2, sigmaY: 2, tileMode: TileMode.clamp),
+      child: SizedBox(height: _size!.height*0.5, width: _size!.width,
         child: Center(
           child: CustomPaint(
             painter: MyPainter(
