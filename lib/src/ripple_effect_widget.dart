@@ -6,16 +6,16 @@ import 'package:ripple_effect/src/ripple_effect_paint.dart';
 
 class RippleEffect extends StatefulWidget {
   const RippleEffect({super.key,
-    required this.parentKe,
-    this.colo = Colors.red,
+    required this.parentKey,
+    this.color = Colors.red,
     this.backDropFilter,
-    this.chil,
+    this.child,
   });
 
-  final GlobalKey parentKe;
-  final Color colo;
+  final GlobalKey parentKey;
+  final Color color;
   final ui.ImageFilter? backDropFilter;
-  final Widget? chil;
+  final Widget? child;
 
   @override
   State<RippleEffect> createState() => _RippleEffectState();
@@ -37,6 +37,7 @@ class _RippleEffectState extends State<RippleEffect> with TickerProviderStateMix
   late Animation<double> thirdRippleWidthAnimation;
   late Animation<double> centerCircleRadiusAnimation;
 
+  final GlobalKey _key = GlobalKey();
 
   late GlobalKey _parentKey;
   late Color _color;
@@ -47,10 +48,10 @@ class _RippleEffectState extends State<RippleEffect> with TickerProviderStateMix
   @override
   void initState() {
     super.initState();
-    _parentKey = widget.parentKe;
-    _color = widget.colo;
+    _parentKey = widget.parentKey;
+    _color = widget.color;
     _filter = ui.ImageFilter.blur(sigmaX: 0, sigmaY: 0, tileMode: TileMode.clamp);
-    _child = widget.chil;
+    _child = widget.child;
     firstRippleController = AnimationController(
       vsync: this,
       duration: const Duration(
@@ -245,19 +246,19 @@ class _RippleEffectState extends State<RippleEffect> with TickerProviderStateMix
   @override
   void didUpdateWidget(covariant RippleEffect oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if(widget.parentKe != oldWidget.parentKe){
-      _parentKey = widget.parentKe;
+    if(widget.parentKey != oldWidget.parentKey){
+      _parentKey = widget.parentKey;
       final RenderBox parentRenderBox = _parentKey.currentContext?.findRenderObject() as RenderBox;
       _size = parentRenderBox.size;
     }
-    if(widget.colo != oldWidget.colo){
-      _color = widget.colo;
+    if(widget.color != oldWidget.color){
+      _color = widget.color;
     }
     if(widget.backDropFilter != oldWidget.backDropFilter && widget.backDropFilter != null){
       _filter = widget.backDropFilter!;
     }
-    if(widget.chil != oldWidget.chil){
-      _child = widget.chil;
+    if(widget.child != oldWidget.child){
+      _child = widget.child;
     }
     setState(() {});
   }
@@ -269,6 +270,7 @@ class _RippleEffectState extends State<RippleEffect> with TickerProviderStateMix
       child: SizedBox(height: _size!.height, width: _size!.width,
         child: Center(
           child: CustomPaint(
+            key: _key,
             size: _size!,
             painter: MyPainter(
               _color,
