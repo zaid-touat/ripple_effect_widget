@@ -6,14 +6,16 @@ import 'package:ripple_effect/src/ripple_effect_paint.dart';
 
 class RippleEffect extends StatefulWidget {
   const RippleEffect({super.key,
-    this.color = Colors.red,
-    required this.parentKey,
-    this.child,
+    required this.parentKe,
+    this.colo = Colors.red,
+    this.backDropFilter,
+    this.chil,
   });
 
-  final Color color;
-  final GlobalKey parentKey;
-  final Widget? child;
+  final GlobalKey parentKe;
+  final Color colo;
+  final ui.ImageFilter? backDropFilter;
+  final Widget? chil;
 
   @override
   State<RippleEffect> createState() => _RippleEffectState();
@@ -35,11 +37,20 @@ class _RippleEffectState extends State<RippleEffect> with TickerProviderStateMix
   late Animation<double> thirdRippleWidthAnimation;
   late Animation<double> centerCircleRadiusAnimation;
 
+
+  late GlobalKey _parentKey;
+  late Color _color;
+  late ui.ImageFilter _filter;
+  Widget? _child;
   Size? _size;
 
   @override
   void initState() {
     super.initState();
+    _parentKey = widget.parentKe;
+    _color = widget.colo;
+    _filter = ui.ImageFilter.blur(sigmaX: 0, sigmaY: 0, tileMode: TileMode.clamp);
+    _child = widget.chil;
     firstRippleController = AnimationController(
       vsync: this,
       duration: const Duration(
@@ -215,7 +226,7 @@ class _RippleEffectState extends State<RippleEffect> with TickerProviderStateMix
     centerCircleController.forward();
 
     WidgetsBinding.instance.addPostFrameCallback((_){
-      final RenderBox parentRenderBox = widget.parentKey.currentContext?.findRenderObject() as RenderBox;
+      final RenderBox parentRenderBox = _parentKey.currentContext?.findRenderObject() as RenderBox;
       _size = parentRenderBox.size;
       setState(() {});
     });
@@ -232,14 +243,35 @@ class _RippleEffectState extends State<RippleEffect> with TickerProviderStateMix
   }
 
   @override
+  void didUpdateWidget(covariant RippleEffect oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if(widget.parentKe != oldWidget.parentKe){
+      _parentKey = widget.parentKe;
+      final RenderBox parentRenderBox = _parentKey.currentContext?.findRenderObject() as RenderBox;
+      _size = parentRenderBox.size;
+    }
+    if(widget.colo != oldWidget.colo){
+      _color = widget.colo;
+    }
+    if(widget.backDropFilter != oldWidget.backDropFilter && widget.backDropFilter != null){
+      _filter = widget.backDropFilter!;
+    }
+    if(widget.chil != oldWidget.chil){
+      _child = widget.chil;
+    }
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
 
-    return _size == null ? SizedBox.shrink() : BackdropFilter(filter: ui.ImageFilter.blur(sigmaX: 2, sigmaY: 2, tileMode: TileMode.clamp),
-      child: SizedBox(height: _size!.height*0.5, width: _size!.width,
+    return _size == null ? SizedBox.shrink() : BackdropFilter(filter: _filter,
+      child: SizedBox(height: _size!.height, width: _size!.width,
         child: Center(
           child: CustomPaint(
+            size: _size!,
             painter: MyPainter(
-              widget.color,
+              _color,
               firstRippleRadiusAnimation.value,
               firstRippleOpacityAnimation.value,
               firstRippleWidthAnimation.value,
@@ -251,7 +283,7 @@ class _RippleEffectState extends State<RippleEffect> with TickerProviderStateMix
               thirdRippleWidthAnimation.value,
               centerCircleRadiusAnimation.value,
             ),
-            child: widget.child,
+            child: _child,
           ),
         ),
       ),
