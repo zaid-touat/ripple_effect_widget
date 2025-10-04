@@ -247,7 +247,7 @@ class _RippleEffectState extends State<RippleEffect> with TickerProviderStateMix
     if(widget.child != oldWidget.child){
       _child = widget.child;
     }
-    setState(() {});
+    //setState(() {});
   }
 
   @override
