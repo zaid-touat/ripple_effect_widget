@@ -39,7 +39,7 @@ class RippleEffectPaint extends CustomPainter {
     canvas.drawCircle(offset, firstRippleRadius*size.width, firstPaint);
 
     Paint secondPaint = Paint();
-    secondPaint.color = myColor.withValues(alpha: secondRippleOpacity, red: 0);
+    secondPaint.color = myColor.withValues(alpha: secondRippleOpacity, green: 50);
     secondPaint.style = PaintingStyle.stroke;
     secondPaint.strokeWidth = secondRippleStrokeWidth;
 
